@@ -1,54 +1,55 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import {
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  Button,
-  TouchableWithoutFeedback,
-  Keyboard,
-  ScrollView,
-  FlatList
-} from 'react-native';
+import { StyleSheet, View, FlatList, Button } from "react-native";
+
+import GoalItem from "./components/GoalItem";
+import GoalInput from "./components/GoalInput";
 
 export default function App() {
-  const [inputValue, setInputValue] = useState('');
   const [goalsArray, setGoalsArray] = useState([]);
+  const [modalOpened, setModalOpened] = useState(false);
 
-  const inputHandler = (enteredText) => {
-    setInputValue(enteredText);
-  };
-
-  const buttonHandler = () => {
-    if (inputValue.trim().length === 0) {
+  const buttonHandler = (val) => {
+    if (val.trim().length === 0) {
       return;
     }
-    setGoalsArray((prevState) => [...prevState, {id: Math.random().toString(), inputValue}]);
-    setInputValue('');
+    setGoalsArray((prevState) => [
+      ...prevState,
+      { id: Math.random().toString(), inputValue: val },
+    ]);
+  };
+
+  const deleteHandler = (givenId) => {
+    setGoalsArray((state) => state.filter((obj) => obj.id !== givenId));
   };
 
   return (
     <View style={styles.container}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.inputButton}>
-          <TextInput
-            placeholder="Your course goal!"
-            style={styles.inp}
-            onChangeText={inputHandler}
-            value={inputValue}
-          />
-          <Button title="Add goal" onPress={buttonHandler} />
-        </View>
-      </TouchableWithoutFeedback>
+      <Button
+        title="add new goal"
+        color="#5e0acc"
+        onPress={() => setModalOpened(true)}
+        style={styles.btnShow}
+      />
+      <GoalInput
+        btnHand={buttonHandler}
+        closeModal={setModalOpened}
+        modalSt={modalOpened}
+      />
       <View style={styles.list}>
-        <FlatList data={goalsArray} keyExtractor={(item) => item.id} renderItem={itemData => {
-          return (
-              <View style={styles.goalWrapper}>
-                <Text style={styles.listText}>{itemData.item.inputValue}</Text>
-              </View>
-          )
-        }} alwaysBounceVertical={true} />
+        <FlatList
+          data={goalsArray}
+          keyExtractor={(item) => item.id}
+          renderItem={(itemData) => {
+            return (
+              <GoalItem
+                text={itemData.item.inputValue}
+                onDeleteItem={deleteHandler}
+                id={itemData.item.id}
+              />
+            );
+          }}
+        />
       </View>
     </View>
   );
@@ -60,30 +61,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     flex: 1,
   },
-  inputButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    flex: 1,
-  },
-  inp: {
-    borderColor: '#ccc',
-    borderWidth: 1,
-    padding: 10,
-    width: '77%',
+  btnShow: {
+    flex: 5,
   },
   list: {
     flex: 5,
-  },
-  goalWrapper: {
-    margin: 10,
-    padding: 10,
-    borderRadius: 7,
-    backgroundColor: '#5e0acc',
-  },
-  listText: {
-    color: 'white',
   },
 });
