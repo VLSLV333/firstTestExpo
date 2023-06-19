@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState } from 'react';
 
-import { StyleSheet, View, FlatList, Button } from "react-native";
+import { StyleSheet, View, FlatList, Button } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 
-import GoalItem from "./components/GoalItem";
-import GoalInput from "./components/GoalInput";
+import GoalItem from './components/GoalItem';
+import GoalInput from './components/GoalInput';
 
 export default function App() {
   const [goalsArray, setGoalsArray] = useState([]);
@@ -17,6 +18,7 @@ export default function App() {
       ...prevState,
       { id: Math.random().toString(), inputValue: val },
     ]);
+    setModalOpened(false);
   };
 
   const deleteHandler = (givenId) => {
@@ -24,34 +26,37 @@ export default function App() {
   };
 
   return (
-    <View style={styles.container}>
-      <Button
-        title="add new goal"
-        color="#5e0acc"
-        onPress={() => setModalOpened(true)}
-        style={styles.btnShow}
-      />
-      <GoalInput
-        btnHand={buttonHandler}
-        closeModal={setModalOpened}
-        modalSt={modalOpened}
-      />
-      <View style={styles.list}>
-        <FlatList
-          data={goalsArray}
-          keyExtractor={(item) => item.id}
-          renderItem={(itemData) => {
-            return (
-              <GoalItem
-                text={itemData.item.inputValue}
-                onDeleteItem={deleteHandler}
-                id={itemData.item.id}
-              />
-            );
-          }}
+    <>
+      <StatusBar style="light" />
+      <View style={styles.container}>
+        <Button
+          title="add new goal"
+          color="#a065ec"
+          onPress={() => setModalOpened(true)}
+          style={styles.btnShow}
         />
+        <GoalInput
+          btnHand={buttonHandler}
+          closeModal={setModalOpened}
+          modalSt={modalOpened}
+        />
+        <View style={styles.list}>
+          <FlatList
+            data={goalsArray}
+            keyExtractor={(item) => item.id}
+            renderItem={(itemData) => {
+              return (
+                <GoalItem
+                  text={itemData.item.inputValue}
+                  onDeleteItem={deleteHandler}
+                  id={itemData.item.id}
+                />
+              );
+            }}
+          />
+        </View>
       </View>
-    </View>
+    </>
   );
 }
 
